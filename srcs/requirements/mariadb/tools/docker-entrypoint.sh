@@ -3,7 +3,7 @@
 set -e
 
 # Environment variable validation
-required_vars=("DB_NAME" "DB_USER" "DB_PASSWORD")
+required_vars=("DB_NAME" "DB_USER" "DB_PASSWORD" "DB_ROOT_PASSWORD")
 for var in "${required_vars[@]}"; do
     if [ -z "${!var}" ]; then
         echo "Error: Required environment variable '$var' is not set." >&2
@@ -30,10 +30,12 @@ if [ ! -d "/var/lib/mysql/mariadb" ]; then
     fi
 
     mysqld --bootstrap << EOF >> $log_file 2>&1
-        FLUSH PRIVILEGES;
-        CREATE DATABASE IF NOT EXISTS $DB_NAME;
+        ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PASSWORD';
+        CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;
         CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
-        GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
+        GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'%';
+        DELETE FROM mysql.user WHERE User='';
+        FLUSH PRIVILEGES;
 EOF
     if [ $? -eq 0 ]; then
         echo "Database configured successfully." >> $log_file
