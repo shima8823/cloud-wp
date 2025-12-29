@@ -15,4 +15,4 @@ COPY ./conf/my.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 3306
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
