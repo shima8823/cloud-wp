@@ -11,6 +11,11 @@ for var in "${required_vars[@]}"; do
     fi
 done
 
+# Escape single quotes for SQL (replace ' with '')
+DB_ROOT_PASSWORD_ESC="${DB_ROOT_PASSWORD//\'/\'\'}"
+DB_USER_ESC="${DB_USER//\'/\'\'}"
+DB_PASSWORD_ESC="${DB_PASSWORD//\'/\'\'}"
+
 # Ensure log directory exists
 mkdir -p /var/log/mysql
 chown mysql:mysql /var/log/mysql
@@ -30,10 +35,10 @@ if [ ! -d "/var/lib/mysql/mariadb" ]; then
     fi
 
     mysqld --bootstrap << EOF >> $log_file 2>&1
-        ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PASSWORD';
+        ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PASSWORD_ESC';
         CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;
-        CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
-        GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'%';
+        CREATE USER '$DB_USER_ESC'@'%' IDENTIFIED BY '$DB_PASSWORD_ESC';
+        GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER_ESC'@'%';
         DELETE FROM mysql.user WHERE User='';
         FLUSH PRIVILEGES;
 EOF
