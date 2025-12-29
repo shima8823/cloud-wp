@@ -17,25 +17,129 @@ resource "aws_instance" "app_server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
 
-  vpc_security_group_ids = [module.vpc.default_security_group_id]
-  subnet_id = module.vpc.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.sgEc2.id]
+  subnet_id              = aws_subnet.mySubnetPub1a.id
 
   tags = {
     Name = var.instance_name
   }
 }
 
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "6.5.1"
+####################
+# VPC
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
+####################
+resource "aws_vpc" "myVpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = "true"
+  enable_dns_hostnames = "true"
 
+  tags = {
+    "Name" = "vpc_ec2_wordpress"
+  }
+}
 
-  name = "example-vpc"
-  cidr = "10.0.0.0/16"
+####################
+# Subnet
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet
+####################
+resource "aws_subnet" "mySubnetPub1a" {
+  vpc_id                  = aws_vpc.myVpc.id
+  availability_zone       = "ap-northeast-1a"
+  cidr_block              = "10.0.0.0/24"
+  map_public_ip_on_launch = "true"
 
-  azs             = ["ap-northeast-1a", "ap-northeast-1c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets  = ["10.0.101.0/24"]
+  tags = {
+    Name = "pub-subnet-1a"
+  }
+}
 
-  enable_dns_hostnames = true
+####################
+# Route Table
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table
+####################
+resource "aws_route_table" "myPubRoute1a" {
+  vpc_id = aws_vpc.myVpc.id
+
+  tags = {
+    Name = "pub-route-table"
+  }
+}
+
+####################
+# IGW
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/internet_gateway
+####################
+resource "aws_internet_gateway" "myIgw" {
+  vpc_id = aws_vpc.myVpc.id
+
+  tags = {
+    Name = "igw"
+  }
+}
+
+####################
+# Route Rule
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route
+####################
+resource "aws_route" "myPubRouteRule1a" {
+  route_table_id         = aws_route_table.myPubRoute1a.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.myIgw.id
+  depends_on             = [aws_route_table.myPubRoute1a]
+}
+
+####################
+# Route Rule Associcate Subnet
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association
+####################
+resource "aws_route_table_association" "myPubRouteRuleAssociatSubnet1a" {
+  subnet_id      = aws_subnet.mySubnetPub1a.id
+  route_table_id = aws_route_table.myPubRoute1a.id
+}
+
+####################
+# Security Group
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group
+####################
+resource "aws_security_group" "sgEc2" {
+  name        = "fw-ec2"
+  description = "SG_EC2"
+  vpc_id      = aws_vpc.myVpc.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sgEc2Accept80" {
+  security_group_id = aws_security_group.sgEc2.id
+
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "tcp"
+  from_port   = 80
+  to_port     = 80
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sgEc2Accept22" {
+  security_group_id = aws_security_group.sgEc2.id
+
+  # TODO: SessionManagerにする
+  cidr_ipv4   = "${chomp(data.http.my_ip.response_body)}/32"
+  ip_protocol = "tcp"
+  from_port   = 22
+  to_port     = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sgEc2Accept443" {
+  security_group_id = aws_security_group.sgEc2.id
+
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
+}
+
+# wget, aptで必要そうなのでとりあえず全て許可
+resource "aws_vpc_security_group_egress_rule" "sgEc2Accept0" {
+  security_group_id = aws_security_group.sgEc2.id
+
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "-1"
 }
