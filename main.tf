@@ -16,6 +16,9 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "app_server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
+  # sshキーを指定
+  # TODO: SessionManagerにする
+  key_name      = aws_key_pair.myKeyPair.key_name
 
   vpc_security_group_ids = [aws_security_group.sgEc2.id]
   subnet_id              = aws_subnet.mySubnetPub1a.id
@@ -106,6 +109,33 @@ resource "aws_security_group" "sgEc2" {
   name        = "fw-ec2"
   description = "SG_EC2"
   vpc_id      = aws_vpc.myVpc.id
+}
+
+# 自分のIPアドレスを動的に取得
+data "http" "my_ip" {
+  url = "https://ifconfig.me/ip"
+}
+
+
+# SSHキーを作成
+# TODO: SessionManagerにする
+resource "tls_private_key" "this" {
+  algorithm = "ED25519"
+}
+
+resource "local_file" "private" {
+  filename        = "id_ed25519"
+  content         = tls_private_key.this.private_key_openssh
+  file_permission = "0600"
+}
+
+####################
+# aws_key_pair
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair
+####################
+resource "aws_key_pair" "myKeyPair" {
+  key_name   = "my-key-pair"
+  public_key = tls_private_key.this.public_key_openssh
 }
 
 resource "aws_vpc_security_group_ingress_rule" "sgEc2Accept80" {
