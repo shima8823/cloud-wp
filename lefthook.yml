@@ -5,6 +5,6 @@ pre-commit:
   parallel: true
   commands:
     terraform-fmt:
-      glob: "*.tf"
+      glob: "*.{tf,tfvars}"
       run: terraform fmt -recursive
       stage_fixed: true
