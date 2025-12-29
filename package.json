@@ -1,0 +1,24 @@
+{
+  "name": "cloud-wp",
+  "version": "1.0.0",
+  "description": "本プロジェクトを実行するために、以下の環境変数を設定してください。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shima8823/cloud-wp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/shima8823/cloud-wp/issues"
+  },
+  "homepage": "https://github.com/shima8823/cloud-wp#readme",
+  "devDependencies": {
+    "lefthook": "^2.0.13"
+  }
+}
