@@ -2,6 +2,19 @@
 
 set -e
 
+# Environment variable validation
+required_vars=("DB_NAME" "DB_USER" "DB_PASSWORD")
+for var in "${required_vars[@]}"; do
+    if [ -z "${!var}" ]; then
+        echo "Error: Required environment variable '$var' is not set." >&2
+        exit 1
+    fi
+done
+
+# Ensure log directory exists
+mkdir -p /var/log/mysql
+chown mysql:mysql /var/log/mysql
+
 log_file="/var/log/mysql/setup.log"
 
 if [ ! -d "/var/lib/mysql/mariadb" ]; then
