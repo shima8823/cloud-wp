@@ -18,7 +18,7 @@ resource "aws_instance" "app_server" {
   instance_type = var.instance_type
   # sshキーを指定
   # TODO: SessionManagerにする
-  key_name      = aws_key_pair.myKeyPair.key_name
+  key_name = aws_key_pair.myKeyPair.key_name
 
   vpc_security_group_ids = [aws_security_group.sgEc2.id]
   subnet_id              = aws_subnet.mySubnetPub1a.id
@@ -170,8 +170,7 @@ resource "aws_vpc_security_group_ingress_rule" "sgEc2Accept443" {
 resource "aws_vpc_security_group_egress_rule" "sgEc2Accept0" {
   security_group_id = aws_security_group.sgEc2.id
 
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
-}
+  cidr_ipv4            = "0.0.0.0/0"
+  ip_protocol          = "-1"
   enable_dns_hostnames = true
 }
