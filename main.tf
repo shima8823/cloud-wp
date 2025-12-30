@@ -173,3 +173,5 @@ resource "aws_vpc_security_group_egress_rule" "sgEc2Accept0" {
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
 }
+  enable_dns_hostnames = true
+}
