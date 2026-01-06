@@ -71,7 +71,7 @@ resource "aws_route_table" "my_pub_route_1a" {
 
 ####################
 # IGW
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/internet_gateway
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway
 ####################
 resource "aws_internet_gateway" "my_igw" {
   vpc_id = aws_vpc.my_vpc.id
