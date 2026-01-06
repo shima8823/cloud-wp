@@ -34,11 +34,11 @@ resource "aws_instance" "app_server" {
 ####################
 resource "aws_vpc" "my_vpc" {
   cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = "true"
-  enable_dns_hostnames = "true"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
-    "Name" = "vpc_ec2_wordpress"
+    Name = "vpc_ec2_wordpress"
   }
 }
 
@@ -50,7 +50,7 @@ resource "aws_subnet" "my_subnet_pub_1a" {
   vpc_id                  = aws_vpc.my_vpc.id
   availability_zone       = "ap-northeast-1a"
   cidr_block              = "10.0.0.0/24"
-  map_public_ip_on_launch = "true"
+  map_public_ip_on_launch = true
 
   tags = {
     Name = "pub-subnet-1a"
