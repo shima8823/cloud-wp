@@ -95,7 +95,7 @@ resource "aws_route" "my_pub_route_rule_1a" {
 # Route Rule Associcate Subnet
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association
 ####################
-resource "aws_route_table_association" "my_pub_route_rule_associat_subnet_1a" {
+resource "aws_route_table_association" "my_pub_route_rule_associate_subnet_1a" {
   subnet_id      = aws_subnet.my_subnet_pub_1a.id
   route_table_id = aws_route_table.my_pub_route_1a.id
 }
