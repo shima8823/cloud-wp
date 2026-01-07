@@ -1,6 +1,7 @@
 notes/
 .DS_Store
 node_modules/
+id_ed25519
 
 # Terraform files
 .terraform/
