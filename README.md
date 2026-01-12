@@ -29,3 +29,12 @@ export AWS_REGION="aregion"
 env | grep AWS
 ```
 
+## Ansible のバージョンについて
+
+本プロジェクトでは Ubuntu 20.04 を使用しています。Ubuntu 20.04 のデフォルト Python は 3.8 ですが、Ansible 2.17 以降ではターゲットサーバーに Python 3.9 以上が必要になります。
+
+そのため、以下のコマンドで ansible-core を 2.16 にダウングレードしてください。
+
+```bash
+pip install 'ansible-core>=2.16,<2.17'
+```
