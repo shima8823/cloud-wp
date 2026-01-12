@@ -1,0 +1,67 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache and install necessary packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - nginx
+        update_cache: yes
+
+    # dockerのインストール
+    - name: Create keyrings directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker's official GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker's official repository
+      apt_repository:
+        repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: install docker engine
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+    
+    - name: copy srcs to server
+      copy:
+        src: ../srcs/
+        dest: /home/ubuntu/srcs/
+        mode: '0755'
+
+    - name: Create volume directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+      loop:
+        - /home/ubuntu/data/database
+        - /home/ubuntu/data/html
+
+    - name: run srcs
+      shell: docker compose -f /home/ubuntu/srcs/docker-compose.yml up -d
