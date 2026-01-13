@@ -2,6 +2,21 @@
 - hosts: wordpress
   become: yes
   tasks:
+
+    - name: Update DuckDNS IP address
+      uri:
+        url: "https://www.duckdns.org/update?domains={{ lookup('env', 'DUCKDNS_DOMAIN') }}&token={{ lookup('env', 'DUCKDNS_TOKEN') }}&ip={{ ansible_host }}"
+      delegate_to: localhost
+      become: no
+      when: lookup('env', 'DUCKDNS_TOKEN') != '' and lookup('env', 'DUCKDNS_DOMAIN') != ''
+
+    - name: Setup cron job to update DuckDNS every 5 minutes
+      cron:
+        name: "Update DuckDNS IP"
+        minute: "*/5"
+        job: 'curl -s "https://www.duckdns.org/update?domains={{ lookup("env", "DUCKDNS_DOMAIN") }}&token={{ lookup("env", "DUCKDNS_TOKEN") }}" >/dev/null 2>&1'
+      when: lookup('env', 'DUCKDNS_TOKEN') != '' and lookup('env', 'DUCKDNS_DOMAIN') != ''
+
     - name: Update apt cache and install necessary packages
       apt:
         name:
