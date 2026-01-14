@@ -3,6 +3,7 @@
   become: yes
   tasks:
 
+    # DDNS
     - name: Update Dynu IP address
       uri:
         url: "https://api.dynu.com/nic/update?hostname={{ lookup('env', 'DYNU_HOSTNAME') }}&password={{ lookup('env', 'DYNU_PASSWORD') }}&myip={{ ansible_host }}"
@@ -17,6 +18,7 @@
         job: 'curl -s "https://api.dynu.com/nic/update?hostname={{ lookup("env", "DYNU_HOSTNAME") }}&password={{ lookup("env", "DYNU_PASSWORD") }}" >/dev/null 2>&1'
       when: lookup('env', 'DYNU_PASSWORD') != '' and lookup('env', 'DYNU_HOSTNAME') != ''
 
+    # apt install
     - name: Update apt cache and install necessary packages
       apt:
         name:
@@ -78,7 +80,7 @@
         - /home/ubuntu/data/database
         - /home/ubuntu/data/html
 
-    # Let's Encrypt証明書の取得（コンテナ起動前に実行）
+    # Let's Encrypt証明書の取得
     - name: Check if certificate already exists
       stat:
         path: /etc/letsencrypt/live/{{ lookup('env', 'DYNU_HOSTNAME') }}/fullchain.pem
@@ -108,5 +110,6 @@
         job: 'docker compose -f /home/ubuntu/srcs/docker-compose.yml down && certbot renew --standalone && docker compose -f /home/ubuntu/srcs/docker-compose.yml up -d >> /var/log/certbot-renewal.log 2>&1'
       when: lookup('env', 'DYNU_HOSTNAME') != '' and lookup('env', 'LETSENCRYPT_EMAIL') != ''
 
+    # docker compose
     - name: Start application containers
       shell: docker compose -f /home/ubuntu/srcs/docker-compose.yml up -d
