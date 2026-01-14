@@ -22,7 +22,7 @@
         name:
           - ca-certificates
           - curl
-          - nginx
+          - certbot
         update_cache: yes
 
     # dockerのインストール
@@ -78,5 +78,35 @@
         - /home/ubuntu/data/database
         - /home/ubuntu/data/html
 
-    - name: run srcs
+    # Let's Encrypt証明書の取得（コンテナ起動前に実行）
+    - name: Check if certificate already exists
+      stat:
+        path: /etc/letsencrypt/live/{{ lookup('env', 'DYNU_HOSTNAME') }}/fullchain.pem
+      register: cert_exists
+      when: lookup('env', 'DYNU_HOSTNAME') != '' and lookup('env', 'LETSENCRYPT_EMAIL') != ''
+
+    - name: Obtain Let's Encrypt certificate (before starting containers)
+      command: >
+        certbot certonly
+        --standalone
+        --preferred-challenges http
+        -d {{ lookup('env', 'DYNU_HOSTNAME') }}
+        --email {{ lookup('env', 'LETSENCRYPT_EMAIL') }}
+        --agree-tos
+        --non-interactive
+      when:
+        - lookup('env', 'DYNU_HOSTNAME') != ''
+        - lookup('env', 'LETSENCRYPT_EMAIL') != ''
+        - not cert_exists.stat.exists | default(false)
+
+    - name: Setup certbot renewal cron job
+      cron:
+        name: "Renew Let's Encrypt certificates"
+        minute: "0"
+        hour: "3"
+        day: "1,15"
+        job: 'docker compose -f /home/ubuntu/srcs/docker-compose.yml down && certbot renew --standalone && docker compose -f /home/ubuntu/srcs/docker-compose.yml up -d >> /var/log/certbot-renewal.log 2>&1'
+      when: lookup('env', 'DYNU_HOSTNAME') != '' and lookup('env', 'LETSENCRYPT_EMAIL') != ''
+
+    - name: Start application containers
       shell: docker compose -f /home/ubuntu/srcs/docker-compose.yml up -d
