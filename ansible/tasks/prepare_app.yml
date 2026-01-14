@@ -1,0 +1,18 @@
+---
+# アプリケーションファイルとディレクトリの準備
+- name: Copy srcs to server
+  copy:
+    src: ../srcs/
+    dest: "{{ srcs_dir }}/"
+    mode: '0755'
+
+- name: Create volume directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+  loop:
+    - "{{ database_dir }}"
+    - "{{ html_dir }}"

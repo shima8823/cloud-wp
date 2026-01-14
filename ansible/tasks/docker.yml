@@ -1,0 +1,36 @@
+---
+# Docker のインストールと設定
+- name: Create keyrings directory
+  file:
+    path: "{{ docker_keyrings_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Download Docker's official GPG key
+  get_url:
+    url: "{{ docker_gpg_key_url }}"
+    dest: "{{ docker_gpg_key_path }}"
+    mode: '0644'
+
+- name: Add Docker's official repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by={{ docker_gpg_key_path }}] https://download.docker.com/linux/ubuntu focal stable"
+    state: present
+
+- name: Install docker engine
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+
+- name: Enable and start Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user to docker group
+  user:
+    name: "{{ app_user }}"
+    groups: docker
+    append: yes

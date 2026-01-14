@@ -1,0 +1,15 @@
+---
+# DDNS (Dynamic DNS) の設定と更新
+- name: Update Dynu IP address
+  uri:
+    url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ ansible_host }}"
+  delegate_to: localhost
+  become: no
+  when: dynu_password != '' and dynu_hostname != ''
+
+- name: Setup cron job to update Dynu every 5 minutes
+  cron:
+    name: "Update Dynu IP"
+    minute: "{{ ddns_update_interval }}"
+    job: 'curl -s "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}" >/dev/null 2>&1'
+  when: dynu_password != '' and dynu_hostname != ''

@@ -1,115 +1,30 @@
 ---
 - hosts: wordpress
   become: yes
+  vars_files:
+    - vars/main.yml
+
   tasks:
+    - name: Configure DDNS
+      import_tasks: tasks/ddns.yml
+      tags: ddns
 
-    # DDNS
-    - name: Update Dynu IP address
-      uri:
-        url: "https://api.dynu.com/nic/update?hostname={{ lookup('env', 'DYNU_HOSTNAME') }}&password={{ lookup('env', 'DYNU_PASSWORD') }}&myip={{ ansible_host }}"
-      delegate_to: localhost
-      become: no
-      when: lookup('env', 'DYNU_PASSWORD') != '' and lookup('env', 'DYNU_HOSTNAME') != ''
+    - name: Install required packages
+      import_tasks: tasks/packages.yml
+      tags: packages
 
-    - name: Setup cron job to update Dynu every 5 minutes
-      cron:
-        name: "Update Dynu IP"
-        minute: "*/5"
-        job: 'curl -s "https://api.dynu.com/nic/update?hostname={{ lookup("env", "DYNU_HOSTNAME") }}&password={{ lookup("env", "DYNU_PASSWORD") }}" >/dev/null 2>&1'
-      when: lookup('env', 'DYNU_PASSWORD') != '' and lookup('env', 'DYNU_HOSTNAME') != ''
+    - name: Install and configure Docker
+      import_tasks: tasks/docker.yml
+      tags: docker
 
-    # apt install
-    - name: Update apt cache and install necessary packages
-      apt:
-        name:
-          - ca-certificates
-          - curl
-          - certbot
-        update_cache: yes
+    - name: Prepare application files and directories
+      import_tasks: tasks/prepare_app.yml
+      tags: prepare
 
-    # dockerのインストール
-    - name: Create keyrings directory
-      file:
-        path: /etc/apt/keyrings
-        state: directory
-        mode: '0755'
+    - name: Configure SSL certificates
+      import_tasks: tasks/ssl.yml
+      tags: ssl
 
-    - name: Download Docker's official GPG key
-      get_url:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        dest: /etc/apt/keyrings/docker.asc
-        mode: '0644'
-
-    - name: Add Docker's official repository
-      apt_repository:
-        repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu focal stable
-        state: present
-
-    - name: install docker engine
-      apt:
-        name: docker-ce
-        state: present
-        update_cache: yes
-
-    - name: Enable and start Docker service
-      systemd:
-        name: docker
-        state: started
-        enabled: yes
-
-    - name: Add user to docker group
-      user:
-        name: ubuntu
-        groups: docker
-        append: yes
-    
-    - name: copy srcs to server
-      copy:
-        src: ../srcs/
-        dest: /home/ubuntu/srcs/
-        mode: '0755'
-
-    - name: Create volume directories
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: ubuntu
-        group: ubuntu
-        mode: '0755'
-      loop:
-        - /home/ubuntu/data/database
-        - /home/ubuntu/data/html
-
-    # Let's Encrypt証明書の取得
-    - name: Check if certificate already exists
-      stat:
-        path: /etc/letsencrypt/live/{{ lookup('env', 'DYNU_HOSTNAME') }}/fullchain.pem
-      register: cert_exists
-      when: lookup('env', 'DYNU_HOSTNAME') != '' and lookup('env', 'LETSENCRYPT_EMAIL') != ''
-
-    - name: Obtain Let's Encrypt certificate (before starting containers)
-      command: >
-        certbot certonly
-        --standalone
-        --preferred-challenges http
-        -d {{ lookup('env', 'DYNU_HOSTNAME') }}
-        --email {{ lookup('env', 'LETSENCRYPT_EMAIL') }}
-        --agree-tos
-        --non-interactive
-      when:
-        - lookup('env', 'DYNU_HOSTNAME') != ''
-        - lookup('env', 'LETSENCRYPT_EMAIL') != ''
-        - not cert_exists.stat.exists | default(false)
-
-    - name: Setup certbot renewal cron job
-      cron:
-        name: "Renew Let's Encrypt certificates"
-        minute: "0"
-        hour: "3"
-        day: "1,15"
-        job: 'docker compose -f /home/ubuntu/srcs/docker-compose.yml down && certbot renew --standalone && docker compose -f /home/ubuntu/srcs/docker-compose.yml up -d >> /var/log/certbot-renewal.log 2>&1'
-      when: lookup('env', 'DYNU_HOSTNAME') != '' and lookup('env', 'LETSENCRYPT_EMAIL') != ''
-
-    # docker compose
-    - name: Start application containers
-      shell: docker compose -f /home/ubuntu/srcs/docker-compose.yml up -d
+    - name: Deploy application
+      import_tasks: tasks/deploy.yml
+      tags: deploy
