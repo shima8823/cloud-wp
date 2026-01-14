@@ -1,0 +1,7 @@
+---
+# 必要なパッケージのインストール
+- name: Update apt cache and install necessary packages
+  apt:
+    name: "{{ required_packages }}"
+    update_cache: yes
+    state: present

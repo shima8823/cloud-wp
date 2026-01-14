@@ -1,0 +1,23 @@
+---
+plugin: amazon.aws.aws_ec2
+
+# リージョン指定
+regions:
+  - ap-northeast-1
+
+# インスタンスの状態フィルター（実行中のみ）
+filters:
+  instance-state-name: running
+  "tag:Name": "learn-terraform"
+
+# グループ設定
+groups:
+  wordpress: "'learn-terraform' in tags.Name"
+
+# ホスト変数の設定
+compose:
+  ansible_host: public_ip_address
+  ansible_user: "'ubuntu'"
+  ansible_ssh_private_key_file: "'../infra/id_ed25519'"
+  ansible_python_interpreter: "'/usr/bin/python3'"
+  ansible_ssh_common_args: "'-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'"
