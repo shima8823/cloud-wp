@@ -3,19 +3,19 @@
   become: yes
   tasks:
 
-    - name: Update DuckDNS IP address
+    - name: Update Dynu IP address
       uri:
-        url: "https://www.duckdns.org/update?domains={{ lookup('env', 'DUCKDNS_DOMAIN') }}&token={{ lookup('env', 'DUCKDNS_TOKEN') }}&ip={{ ansible_host }}"
+        url: "https://api.dynu.com/nic/update?hostname={{ lookup('env', 'DYNU_HOSTNAME') }}&password={{ lookup('env', 'DYNU_PASSWORD') }}&myip={{ ansible_host }}"
       delegate_to: localhost
       become: no
-      when: lookup('env', 'DUCKDNS_TOKEN') != '' and lookup('env', 'DUCKDNS_DOMAIN') != ''
+      when: lookup('env', 'DYNU_PASSWORD') != '' and lookup('env', 'DYNU_HOSTNAME') != ''
 
-    - name: Setup cron job to update DuckDNS every 5 minutes
+    - name: Setup cron job to update Dynu every 5 minutes
       cron:
-        name: "Update DuckDNS IP"
+        name: "Update Dynu IP"
         minute: "*/5"
-        job: 'curl -s "https://www.duckdns.org/update?domains={{ lookup("env", "DUCKDNS_DOMAIN") }}&token={{ lookup("env", "DUCKDNS_TOKEN") }}" >/dev/null 2>&1'
-      when: lookup('env', 'DUCKDNS_TOKEN') != '' and lookup('env', 'DUCKDNS_DOMAIN') != ''
+        job: 'curl -s "https://api.dynu.com/nic/update?hostname={{ lookup("env", "DYNU_HOSTNAME") }}&password={{ lookup("env", "DYNU_PASSWORD") }}" >/dev/null 2>&1'
+      when: lookup('env', 'DYNU_PASSWORD') != '' and lookup('env', 'DYNU_HOSTNAME') != ''
 
     - name: Update apt cache and install necessary packages
       apt:
