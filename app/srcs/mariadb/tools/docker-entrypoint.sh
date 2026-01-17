@@ -11,42 +11,60 @@ for var in "${required_vars[@]}"; do
     fi
 done
 
-# Escape single quotes for SQL (replace ' with '')
-DB_ROOT_PASSWORD_ESC="${DB_ROOT_PASSWORD//\'/\'\'}"
-DB_USER_ESC="${DB_USER//\'/\'\'}"
-DB_PASSWORD_ESC="${DB_PASSWORD//\'/\'\'}"
+# Ensure directories exist with correct permissions
+mkdir -p /var/log/mysql /run/mysqld
+chown -R mysql:mysql /var/log/mysql /run/mysqld /var/lib/mysql
 
-# Ensure log directory exists
-mkdir -p /var/log/mysql
-chown mysql:mysql /var/log/mysql
+# Check if database needs initialization
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+    echo "Initializing MariaDB..."
 
-log_file="/var/log/mysql/setup.log"
+    # Initialize database
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-if [ ! -d "/var/lib/mysql/mariadb" ]; then
-    echo "Initializing MariaDB..." >> $log_file
+    echo "Starting temporary MariaDB server..."
+    # Start MariaDB temporarily without networking for setup
+    mysqld --user=mysql --skip-networking &
+    pid="$!"
 
-    echo "Running as user: $(whoami)" >> $log_file
+    # Wait for MariaDB to be ready
+    echo "Waiting for MariaDB to start..."
+    for i in {1..30}; do
+        if mysqladmin ping --silent 2>/dev/null; then
+            break
+        fi
+        sleep 1
+    done
 
-    mysql_install_db >> $log_file 2>&1
-    if [ $? -eq 0 ]; then
-        echo "Database installed successfully." >> $log_file
-    else
-        echo "Failed to install database." >> $log_file
+    if ! mysqladmin ping --silent 2>/dev/null; then
+        echo "MariaDB failed to start"
+        exit 1
     fi
 
-    mysqld --bootstrap << EOF >> $log_file 2>&1
-        ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PASSWORD_ESC';
-        CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;
-        CREATE USER '$DB_USER_ESC'@'%' IDENTIFIED BY '$DB_PASSWORD_ESC';
-        GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER_ESC'@'%';
+    echo "Configuring MariaDB..."
+    # Run initialization SQL
+    mysql --user=root << EOF
+        -- Set root password
+        ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASSWORD}';
+        -- Create database
+        CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
+        -- Create user
+        CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+        -- Grant privileges
+        GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'%';
+        -- Remove anonymous users
         DELETE FROM mysql.user WHERE User='';
+        -- Apply changes
         FLUSH PRIVILEGES;
 EOF
-    if [ $? -eq 0 ]; then
-        echo "Database configured successfully." >> $log_file
-    else
-        echo "Failed to configure database." >> $log_file
-    fi
+
+    echo "Database configured successfully."
+
+    # Shutdown temporary server
+    mysqladmin --user=root --password="${DB_ROOT_PASSWORD}" shutdown
+
+    echo "Temporary server stopped."
 fi
 
-mysqld_safe >> $log_file 2>&1
+echo "Starting MariaDB..."
+exec mysqld --user=mysql
