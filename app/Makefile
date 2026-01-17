@@ -130,9 +130,11 @@ setup: ## Create .env from .env.example if not exists
 setup-dirs: ## Create volume directories from .env
 	@echo "$(GREEN)Creating volume directories...$(NC)"
 	@. ./$(ENV_FILE) && \
-		sudo mkdir -p "$${WP_VOLUME_PATH}" "$${WP_LOGS_PATH}" \
-		              "$${DB_VOLUME_PATH}" "$${DB_LOGS_PATH}" \
-		              "$${NGINX_LOGS_PATH}"
+		sudo mkdir -p "$${DATA_ROOT_PATH}/wordpress/data" \
+		              "$${DATA_ROOT_PATH}/wordpress/logs" \
+		              "$${DATA_ROOT_PATH}/mariadb/data" \
+		              "$${DATA_ROOT_PATH}/mariadb/logs" \
+		              "$${DATA_ROOT_PATH}/nginx/logs"
 
 # =============================================================================
 # Health & Debug

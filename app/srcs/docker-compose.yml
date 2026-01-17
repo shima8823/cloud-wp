@@ -71,29 +71,29 @@ volumes:
     driver: local
     driver_opts:
       o: bind
-      device: ${NGINX_LOGS_PATH}
+      device: ${DATA_ROOT_PATH}/nginx/logs
       type: none
   wp_data:
     driver: local
     driver_opts:
       o: bind
-      device: ${WP_VOLUME_PATH}
+      device: ${DATA_ROOT_PATH}/wordpress/data
       type: none
   wp_logs:
     driver: local
     driver_opts:
       o: bind
-      device: ${WP_LOGS_PATH}
+      device: ${DATA_ROOT_PATH}/wordpress/logs
       type: none
   db_data:
     driver: local
     driver_opts:
       o: bind
-      device: ${DB_VOLUME_PATH}
+      device: ${DATA_ROOT_PATH}/mariadb/data
       type: none
   db_logs:
     driver: local
     driver_opts:
       o: bind
-      device: ${DB_LOGS_PATH}
+      device: ${DATA_ROOT_PATH}/mariadb/logs
       type: none
