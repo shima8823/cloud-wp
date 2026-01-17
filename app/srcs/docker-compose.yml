@@ -1,6 +1,6 @@
 services:
   nginx:
-    build: ./requirements/nginx
+    build: ./nginx
     ports:
       - "443:443"
     depends_on:
@@ -15,7 +15,7 @@ services:
       - inception-net
 
   wordpress:
-    build: ./requirements/wordpress
+    build: ./wordpress
     expose:
       - "9000"
     depends_on:
@@ -42,7 +42,7 @@ services:
       - inception-net
 
   mariadb:
-    build: ./requirements/mariadb
+    build: ./mariadb
     expose:
       - "3306"
     restart: always
