@@ -2,10 +2,10 @@
 
 set -e
 
-# Environment variable validation
+# Default to localhost if DOMAIN_NAME is not set
 if [ -z "${DOMAIN_NAME}" ]; then
-    echo "Error: Required environment variable 'DOMAIN_NAME' is not set." >&2
-    exit 1
+    export DOMAIN_NAME="localhost"
+    echo "DOMAIN_NAME not set, using default: localhost"
 fi
 
 # Generate SSL certificate if not exists

@@ -21,6 +21,12 @@ all: env-check up
 up: env-check setup-dirs ## Start all containers
 	@echo "$(GREEN)Starting containers...$(NC)"
 	$(DC) up -d --build
+	@echo ""
+	@echo "$(GREEN)========================================$(NC)"
+	@echo "$(GREEN)  WordPress is running!$(NC)"
+	@echo "$(GREEN)========================================$(NC)"
+	@. ./$(ENV_FILE) && echo "  Access: $(YELLOW)https://$${DOMAIN_NAME:-localhost}$(NC)"
+	@echo "$(GREEN)========================================$(NC)"
 
 down: ## Stop all containers (keep volumes)
 	@echo "$(YELLOW)Stopping containers...$(NC)"
@@ -31,6 +37,12 @@ stop: ## Stop containers without removing
 
 start: ## Start stopped containers
 	$(DC) start
+	@echo ""
+	@echo "$(GREEN)========================================$(NC)"
+	@echo "$(GREEN)  WordPress is running!$(NC)"
+	@echo "$(GREEN)========================================$(NC)"
+	@. ./$(ENV_FILE) && echo "  Access: $(YELLOW)https://$${DOMAIN_NAME:-localhost}$(NC)"
+	@echo "$(GREEN)========================================$(NC)"
 
 restart: down up ## Restart all containers
 
@@ -49,10 +61,12 @@ clean: ## Stop and remove containers, networks, volumes
 	@echo "$(YELLOW)Cleaning up containers and volumes...$(NC)"
 	$(DC) down -v --remove-orphans
 
-fclean: clean ## Full cleanup including images
+fclean: clean ## Full cleanup including images and data
 	@echo "$(RED)Removing all project images...$(NC)"
 	$(DC) down --rmi all
 	docker system prune -f
+	@echo "$(RED)Removing data directory...$(NC)"
+	rm -rf srcs/data
 
 re: fclean all ## Full rebuild
 
@@ -130,11 +144,11 @@ setup: ## Create .env from .env.example if not exists
 setup-dirs: ## Create volume directories from .env
 	@echo "$(GREEN)Creating volume directories...$(NC)"
 	@. ./$(ENV_FILE) && \
-		sudo mkdir -p "$${DATA_ROOT_PATH}/wordpress/data" \
-		              "$${DATA_ROOT_PATH}/wordpress/logs" \
-		              "$${DATA_ROOT_PATH}/mariadb/data" \
-		              "$${DATA_ROOT_PATH}/mariadb/logs" \
-		              "$${DATA_ROOT_PATH}/nginx/logs"
+		mkdir -p "$${DATA_ROOT_PATH}/wordpress/data" \
+		         "$${DATA_ROOT_PATH}/wordpress/logs" \
+		         "$${DATA_ROOT_PATH}/mariadb/data" \
+		         "$${DATA_ROOT_PATH}/mariadb/logs" \
+		         "$${DATA_ROOT_PATH}/nginx/logs"
 
 # =============================================================================
 # Health & Debug
