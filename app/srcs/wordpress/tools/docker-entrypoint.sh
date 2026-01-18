@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 chown -R nginx:nginx /run/php /var/www/html /var/www/.wp-cli
 
 # Check if wp-config.php exists, if not create it and install WordPress
