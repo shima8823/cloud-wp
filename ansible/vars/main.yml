@@ -4,10 +4,9 @@ app_user: ubuntu
 app_home: /home/ubuntu
 
 # ディレクトリ設定
+local_srcs_dir: "{{ lookup('env', 'LOCAL_SRCS_DIR') | default('../app/srcs/', true) }}"
 srcs_dir: "{{ app_home }}/srcs"
 data_dir: "{{ app_home }}/data"
-database_dir: "{{ data_dir }}/database"
-html_dir: "{{ data_dir }}/html"
 
 # 必要なパッケージ
 required_packages:
