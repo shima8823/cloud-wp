@@ -1,0 +1,13 @@
+#!/bin/bash
+# DDNS (Dynu) 自動更新スクリプト
+# このスクリプトは認証情報を保護するため、root所有で700パーミッションに設定されています
+
+# 環境変数として認証情報を設定
+DYNU_HOSTNAME="{{ dynu_hostname }}"
+DYNU_PASSWORD="{{ dynu_password }}"
+
+# IPアドレスを取得して更新
+curl -s "https://api.dynu.com/nic/update?hostname=${DYNU_HOSTNAME}&password=${DYNU_PASSWORD}" >/dev/null 2>&1
+
+# 終了
+exit 0

@@ -1,0 +1,34 @@
+---
+# ユーザー設定
+app_user: ubuntu
+app_home: /home/ubuntu
+
+# ディレクトリ設定
+local_srcs_dir: "{{ lookup('env', 'LOCAL_SRCS_DIR') | default('../app/srcs/', true) }}"
+srcs_dir: "{{ app_home }}/srcs"
+data_dir: "{{ app_home }}/data"
+
+# 必要なパッケージ
+required_packages:
+  - ca-certificates
+  - curl
+  - certbot
+
+# Docker設定
+docker_keyrings_dir: /etc/apt/keyrings
+docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
+docker_gpg_key_path: "{{ docker_keyrings_dir }}/docker.asc"
+
+# DDNS設定（環境変数から取得）
+dynu_hostname: "{{ lookup('env', 'DYNU_HOSTNAME') }}"
+dynu_password: "{{ lookup('env', 'DYNU_PASSWORD') }}"
+
+# Let's Encrypt設定（環境変数から取得）
+letsencrypt_email: "{{ lookup('env', 'LETSENCRYPT_EMAIL') }}"
+cert_path: "/etc/letsencrypt/live/{{ dynu_hostname }}/fullchain.pem"
+
+# Cron設定
+ddns_update_interval: "*/5"
+cert_renewal_day: "1,15"
+cert_renewal_hour: "3"
+cert_renewal_minute: "0"

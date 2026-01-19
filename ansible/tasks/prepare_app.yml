@@ -1,0 +1,21 @@
+---
+# アプリケーションファイルとディレクトリの準備
+- name: Copy srcs to server
+  copy:
+    src: "{{ local_srcs_dir }}"
+    dest: "{{ srcs_dir }}/"
+    mode: '0755'
+
+- name: Create volume directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+  loop:
+    - "{{ data_dir }}/nginx/logs"
+    - "{{ data_dir }}/wordpress/data"
+    - "{{ data_dir }}/wordpress/logs"
+    - "{{ data_dir }}/mariadb/data"
+    - "{{ data_dir }}/mariadb/logs"
