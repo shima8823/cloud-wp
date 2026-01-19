@@ -16,9 +16,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "app_server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
-  # sshキーを指定
-  # TODO: SessionManagerにする
-  key_name = aws_key_pair.my_key_pair.key_name
+  iam_instance_profile = aws_iam_instance_profile.ssm.name
 
   vpc_security_group_ids = [aws_security_group.sg_ec2.id]
   subnet_id              = aws_subnet.my_subnet_pub_1a.id
@@ -110,31 +108,34 @@ resource "aws_security_group" "sg_ec2" {
   vpc_id      = aws_vpc.my_vpc.id
 }
 
-# 自分のIPアドレスを動的に取得
-data "http" "my_ip" {
-  url = "https://ifconfig.me/ip"
-}
-
-
-# SSHキーを作成
-# TODO: SessionManagerにする
-resource "tls_private_key" "this" {
-  algorithm = "ED25519"
-}
-
-resource "local_file" "private" {
-  filename        = "id_ed25519"
-  content         = tls_private_key.this.private_key_openssh
-  file_permission = "0600"
-}
-
 ####################
-# aws_key_pair
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair
+# SSM IAM
 ####################
-resource "aws_key_pair" "my_key_pair" {
-  key_name   = "my-key-pair"
-  public_key = tls_private_key.this.public_key_openssh
+resource "aws_iam_role" "ssm_role" {
+  name = "ec2-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ssm" {
+  name = "ec2-ssm-instance-profile"
+  role = aws_iam_role.ssm_role.name
 }
 
 resource "aws_vpc_security_group_ingress_rule" "sg_ec2_accept_80" {
@@ -144,16 +145,6 @@ resource "aws_vpc_security_group_ingress_rule" "sg_ec2_accept_80" {
   ip_protocol = "tcp"
   from_port   = 80
   to_port     = 80
-}
-
-resource "aws_vpc_security_group_ingress_rule" "sg_ec2_accept_22" {
-  security_group_id = aws_security_group.sg_ec2.id
-
-  # TODO: SessionManagerにする
-  cidr_ipv4   = "${chomp(data.http.my_ip.response_body)}/32"
-  ip_protocol = "tcp"
-  from_port   = 22
-  to_port     = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "sg_ec2_accept_443" {
