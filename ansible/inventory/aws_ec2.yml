@@ -16,8 +16,8 @@ groups:
 
 # ホスト変数の設定
 compose:
-  ansible_host: public_ip_address
-  ansible_user: "'ubuntu'"
-  ansible_ssh_private_key_file: "'../infra/id_ed25519'"
+  ansible_host: instance_id
+  actual_ip: public_ip_address
+  ansible_connection: "'amazon.aws.aws_ssm'"
+  ansible_aws_ssm_region: "'ap-northeast-1'"
   ansible_python_interpreter: "'/usr/bin/python3'"
-  ansible_ssh_common_args: "'-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'"
