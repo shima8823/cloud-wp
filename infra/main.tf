@@ -14,8 +14,8 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "app_server" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = var.instance_type
+  ami                  = data.aws_ami.ubuntu.id
+  instance_type        = var.instance_type
   iam_instance_profile = aws_iam_instance_profile.ssm.name
 
   vpc_security_group_ids = [aws_security_group.sg_ec2.id]
@@ -163,3 +163,59 @@ resource "aws_vpc_security_group_egress_rule" "sg_ec2_accept_0" {
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
 }
+
+####################
+# S3 Bucket for Ansible SSM
+####################
+resource "aws_s3_bucket" "ansible_ssm" {
+  tags = {
+    Name = "ansible-ssm-bucket"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "ansible_ssm" {
+  bucket = aws_s3_bucket.ansible_ssm.id
+
+  rule {
+    id     = "cleanup"
+    status = "Enabled"
+
+    expiration {
+      days = 1
+    }
+  }
+}
+
+resource "aws_iam_role_policy" "ssm_s3_access" {
+  name = "ssm-s3-access"
+  role = aws_iam_role.ssm_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${aws_s3_bucket.ansible_ssm.arn}/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
+        Resource = aws_s3_bucket.ansible_ssm.arn
+      }
+    ]
+  })
+}
+
+resource "local_file" "ansible_group_vars" {
+  content  = <<EOT
+# SSM接続用S3バケット名（Terraformで作成）
+ansible_aws_ssm_bucket_name: ${aws_s3_bucket.ansible_ssm.bucket}
+EOT
+  filename = "${path.module}/../ansible/group_vars/all.yml"
+}
+
