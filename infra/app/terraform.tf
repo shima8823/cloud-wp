@@ -1,4 +1,6 @@
 terraform {
+  required_version = "~> 1.14.0"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -6,10 +8,7 @@ terraform {
     }
   }
 
-  required_version = "~> 1.14.0"
-
   backend "s3" {
-    bucket       = "terraform-state-shima-3668f6c4"
     key          = "state/terraform.tfstate"
     region       = "ap-northeast-1"
     use_lockfile = true
