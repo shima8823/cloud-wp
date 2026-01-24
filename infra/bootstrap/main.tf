@@ -1,18 +1,3 @@
-provider "aws" {
-  region = "ap-northeast-1"
-
-  default_tags {
-    tags = {
-      Project   = "CloudStudy"
-      ManagedBy = "Terraform"
-      Owner     = "shima"
-    }
-  }
-}
-
-####################
-# Terraform State S3
-####################
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state-shima-3668f6c4"
 
