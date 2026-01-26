@@ -23,11 +23,11 @@ init-app:
 plan-app:
 	@terraform -chdir=app plan
 
-app-app:
+apply-app:
 	@terraform -chdir=app apply
 
-des-app:
-	@terraform -chdir=app destroy -auto-approve
+destroy-app:
+	@terraform -chdir=app destroy
 
 re-app:
 	@terraform -chdir=app destroy -auto-approve
