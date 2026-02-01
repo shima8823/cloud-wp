@@ -14,7 +14,7 @@ permissions:
   pull-requests: write # PRコメントに必要
 
 env:
-  TF_VERSION: "1.10.0"
+  TF_VERSION: "1.14.0"
   TFCMT_VERSION: "v4.14.0"
   AWS_REGION: "ap-northeast-1"
 
