@@ -2,7 +2,7 @@
 # DDNS (Dynamic DNS) の設定と更新
 - name: Update Dynu IP address
   uri:
-    url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ ansible_host }}"
+    url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ actual_ip }}"
   delegate_to: localhost
   become: no
   no_log: true
