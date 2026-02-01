@@ -25,5 +25,5 @@ resource "local_file" "ansible_group_vars" {
 # SSM接続用S3バケット名（Terraformで作成）
 ansible_aws_ssm_bucket_name: ${aws_s3_bucket.ansible_ssm.bucket}
 EOT
-  filename = "${path.module}/../ansible/group_vars/all.yml"
+  filename = "${path.module}/../../ansible/group_vars/all.yml"
 }
