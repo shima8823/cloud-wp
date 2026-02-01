@@ -2,12 +2,14 @@ services:
   nginx:
     build: ./nginx
     ports:
+      - "80:80"
       - "443:443"
     depends_on:
       - wordpress
     volumes:
       - wp_data:/var/www/html:ro
       - nginx_logs:/var/log/nginx
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     restart: always
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}

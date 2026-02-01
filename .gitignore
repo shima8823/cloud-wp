@@ -1,3 +1,6 @@
 notes/
 .DS_Store
 node_modules/
+
+# Terraform generated ansible vars
+ansible/group_vars/all.yml
