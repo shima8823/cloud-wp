@@ -22,9 +22,10 @@ resource "aws_iam_role" "github_actions" {
         Condition = {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+            "token.actions.githubusercontent.com:sub" = "repo:shima8823/cloud-wp:pull_request"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:shima8823/cloud-wp:*"
+            "token.actions.githubusercontent.com:job_workflow_ref" = "shima8823/cloud-wp/.github/workflows/terraform.yml@*"
           }
         }
       }

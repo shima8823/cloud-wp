@@ -84,6 +84,7 @@ ansible-playbook -i inventory/aws_ec2.yml main.yml
 | ドキュメント | 説明 |
 |------------|------|
 | [`docs/AWS_SETUP.md`](./docs/AWS_SETUP.md) | AWS アカウントの初期セットアップ手順（Root → IAM User → AssumeRole） |
+| [`docs/GITHUB_ACTIONS_SETUP.md`](./docs/GITHUB_ACTIONS_SETUP.md) | GitHub Actions OIDC セットアップ手順 |
 | [`docs/architecture.drawio.svg`](./docs/architecture.drawio.svg) | インフラ構成図（VPC、EC2、セキュリティグループなど） |
 | [`infra/bootstrap/README.md`](./infra/bootstrap/README.md) | Bootstrap インフラ（IAM ロール、S3 バケット）の詳細 |
 
@@ -198,7 +199,8 @@ make destroy-app
 cloud-1/
 ├── README.md                    # このファイル
 ├── docs/                        # ドキュメント
-│   └── AWS_SETUP.md            # AWS 初期セットアップ手順
+│   ├── AWS_SETUP.md            # AWS 初期セットアップ手順
+│   └── GITHUB_ACTIONS_SETUP.md # GitHub Actions OIDC セットアップ手順
 ├── infra/                       # Terraform (インフラ定義)
 │   ├── Makefile                # よく使うコマンドのショートカット
 │   ├── bootstrap/              # 基盤リソース（IAM, S3）
