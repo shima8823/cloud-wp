@@ -34,6 +34,12 @@ variable "public_route_cidr_ipv4" {
   default     = "0.0.0.0/0"
 }
 
+variable "egress_cidr_ipv4" {
+  description = "IPv4 CIDR allowed for outbound HTTP/HTTPS."
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
 variable "public_subnet_cidr" {
   description = "CIDR block for the public subnet."
   type        = string
