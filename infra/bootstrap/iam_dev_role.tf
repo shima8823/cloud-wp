@@ -59,8 +59,7 @@ resource "aws_iam_policy" "dev_guardrail" {
         ]
         Resource = "*"
       },
-      # 3. ガードレール外し(脱獄)の禁止
-      # このRoleとAdminRoleに対してポリシーを外したり、信頼関係を変えたりすることを禁止
+      # 3. RoleとAdminRoleに対してポリシーを外したり、信頼関係を変えたりすることを禁止
       {
         Sid    = "PreventRoleModification"
         Effect = "Deny"
