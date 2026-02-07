@@ -3,9 +3,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project   = "CloudStudy"
-      ManagedBy = "Terraform"
-      Owner     = "shima"
+      ManagedBy = "terraform"
+      Project   = "cloud-wp/bootstrap"
     }
   }
 }
