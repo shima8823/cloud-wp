@@ -1,4 +1,4 @@
-data "aws_ami" "ubuntu" {
+data "aws_ami" "ubuntu_2004" {
   most_recent = true
 
   filter {
@@ -9,13 +9,13 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_instance" "app_server" {
-  ami                  = data.aws_ami.ubuntu.id
+resource "aws_instance" "wordpress" {
+  ami                  = data.aws_ami.ubuntu_2004.id
+  iam_instance_profile = aws_iam_instance_profile.ec2_ssm.name
   instance_type        = var.instance_type
-  iam_instance_profile = aws_iam_instance_profile.ssm.name
 
-  vpc_security_group_ids = [aws_security_group.sg_ec2.id]
-  subnet_id              = aws_subnet.my_subnet_pub_1a.id
+  subnet_id              = aws_subnet.public_1a.id
+  vpc_security_group_ids = [aws_security_group.ec2.id]
 
   tags = {
     Name = var.instance_name

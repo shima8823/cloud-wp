@@ -1,107 +1,62 @@
-####################
-# VPC
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
-####################
-resource "aws_vpc" "my_vpc" {
-  cidr_block           = "10.0.0.0/16"
+resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
-
-  tags = {
-    Name = "vpc_ec2_wordpress"
-  }
 }
 
-####################
-# Subnet
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet
-####################
-resource "aws_subnet" "my_subnet_pub_1a" {
-  vpc_id                  = aws_vpc.my_vpc.id
-  availability_zone       = "ap-northeast-1a"
-  cidr_block              = "10.0.0.0/24"
+resource "aws_subnet" "public_1a" {
+  vpc_id                  = aws_vpc.main.id
+  availability_zone       = var.availability_zone
+  cidr_block              = var.public_subnet_cidr
   map_public_ip_on_launch = true
-
-  tags = {
-    Name = "pub-subnet-1a"
-  }
 }
 
-####################
-# Route Table
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table
-####################
-resource "aws_route_table" "my_pub_route_1a" {
-  vpc_id = aws_vpc.my_vpc.id
-
-  tags = {
-    Name = "pub-route-table"
-  }
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
 }
 
-####################
-# IGW
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway
-####################
-resource "aws_internet_gateway" "my_igw" {
-  vpc_id = aws_vpc.my_vpc.id
-
-  tags = {
-    Name = "igw"
-  }
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
 }
 
-####################
-# Route Rule
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route
-####################
-resource "aws_route" "my_pub_route_rule_1a" {
-  route_table_id         = aws_route_table.my_pub_route_1a.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.my_igw.id
+resource "aws_route" "public_default" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = var.public_route_cidr_ipv4
+  gateway_id             = aws_internet_gateway.main.id
 }
 
-####################
-# Route Rule Associcate Subnet
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association
-####################
-resource "aws_route_table_association" "my_pub_route_rule_associate_subnet_1a" {
-  subnet_id      = aws_subnet.my_subnet_pub_1a.id
-  route_table_id = aws_route_table.my_pub_route_1a.id
+resource "aws_route_table_association" "public_1a" {
+  subnet_id      = aws_subnet.public_1a.id
+  route_table_id = aws_route_table.public.id
 }
 
-####################
-# Security Group
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group
-####################
-resource "aws_security_group" "sg_ec2" {
+resource "aws_security_group" "ec2" {
   name        = "fw-ec2"
-  description = "SG_EC2"
-  vpc_id      = aws_vpc.my_vpc.id
+  description = "Security group for the WordPress EC2 instance."
+  vpc_id      = aws_vpc.main.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sg_ec2_accept_80" {
-  security_group_id = aws_security_group.sg_ec2.id
+resource "aws_vpc_security_group_ingress_rule" "ingress_http" {
+  security_group_id = aws_security_group.ec2.id
 
-  cidr_ipv4   = "0.0.0.0/0"
+  cidr_ipv4   = var.public_ingress_cidr_ipv4
   ip_protocol = "tcp"
   from_port   = 80
   to_port     = 80
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sg_ec2_accept_443" {
-  security_group_id = aws_security_group.sg_ec2.id
+resource "aws_vpc_security_group_ingress_rule" "ingress_https" {
+  security_group_id = aws_security_group.ec2.id
 
-  cidr_ipv4   = "0.0.0.0/0"
+  cidr_ipv4   = var.public_ingress_cidr_ipv4
   ip_protocol = "tcp"
   from_port   = 443
   to_port     = 443
 }
 
-# wget, aptで必要そうなのでとりあえず全て許可
-resource "aws_vpc_security_group_egress_rule" "sg_ec2_accept_0" {
-  security_group_id = aws_security_group.sg_ec2.id
+resource "aws_vpc_security_group_egress_rule" "egress_all" {
+  security_group_id = aws_security_group.ec2.id
 
-  cidr_ipv4   = "0.0.0.0/0"
+  cidr_ipv4   = var.public_route_cidr_ipv4
   ip_protocol = "-1"
 }
