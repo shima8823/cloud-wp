@@ -8,11 +8,11 @@ regions:
 # インスタンスの状態フィルター（実行中のみ）
 filters:
   instance-state-name: running
-  "tag:Name": "learn-terraform"
+  "tag:Name": "wordpress"
 
 # グループ設定
 groups:
-  wordpress: "'learn-terraform' in tags.Name"
+  wordpress: "'wordpress' in tags.Name"
 
 # ホスト変数の設定
 compose:
