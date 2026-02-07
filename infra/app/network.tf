@@ -21,7 +21,7 @@ resource "aws_internet_gateway" "main" {
 
 resource "aws_route" "public_default" {
   route_table_id         = aws_route_table.public.id
-  destination_cidr_block = var.public_route_cidr_ipv4
+  destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.main.id
 }
 
@@ -39,7 +39,7 @@ resource "aws_security_group" "ec2" {
 resource "aws_vpc_security_group_ingress_rule" "ingress_http" {
   security_group_id = aws_security_group.ec2.id
 
-  cidr_ipv4   = var.public_ingress_cidr_ipv4
+  cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "tcp"
   from_port   = 80
   to_port     = 80
@@ -48,7 +48,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_http" {
 resource "aws_vpc_security_group_ingress_rule" "ingress_https" {
   security_group_id = aws_security_group.ec2.id
 
-  cidr_ipv4   = var.public_ingress_cidr_ipv4
+  cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "tcp"
   from_port   = 443
   to_port     = 443
@@ -58,7 +58,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_https" {
 resource "aws_vpc_security_group_egress_rule" "egress_http" {
   security_group_id = aws_security_group.ec2.id
 
-  cidr_ipv4   = var.egress_cidr_ipv4
+  cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "tcp"
   from_port   = 80
   to_port     = 80
@@ -68,7 +68,7 @@ resource "aws_vpc_security_group_egress_rule" "egress_http" {
 resource "aws_vpc_security_group_egress_rule" "egress_https" {
   security_group_id = aws_security_group.ec2.id
 
-  cidr_ipv4   = var.egress_cidr_ipv4
+  cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "tcp"
   from_port   = 443
   to_port     = 443

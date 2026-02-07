@@ -22,24 +22,6 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
-variable "public_ingress_cidr_ipv4" {
-  description = "IPv4 CIDR allowed for inbound HTTP/HTTPS."
-  type        = string
-  default     = "0.0.0.0/0"
-}
-
-variable "public_route_cidr_ipv4" {
-  description = "Destination IPv4 CIDR for the public default route."
-  type        = string
-  default     = "0.0.0.0/0"
-}
-
-variable "egress_cidr_ipv4" {
-  description = "IPv4 CIDR allowed for outbound HTTP/HTTPS."
-  type        = string
-  default     = "0.0.0.0/0"
-}
-
 variable "public_subnet_cidr" {
   description = "CIDR block for the public subnet."
   type        = string
