@@ -1,9 +1,11 @@
 output "state_bucket_name" {
-  value = aws_s3_bucket.terraform_state.id
+  description = "Terraform state bucket name."
+  value       = aws_s3_bucket.terraform_state.id
 }
 
 output "terraform_dev_role_arn" {
-  value = aws_iam_role.terraform_dev.arn
+  description = "ARN of TerraformDevRole."
+  value       = aws_iam_role.terraform_dev.arn
 }
 
 output "github_actions_role_arn" {

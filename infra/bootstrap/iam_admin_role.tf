@@ -19,12 +19,6 @@ resource "aws_iam_role" "terraform_admin" {
       }
     ]
   })
-
-  tags = {
-    Project   = "CloudStudy"
-    ManagedBy = "Terraform"
-    Owner     = "shima"
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "admin_access" {
