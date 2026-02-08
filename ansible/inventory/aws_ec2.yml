@@ -1,23 +1,19 @@
 ---
 plugin: amazon.aws.aws_ec2
 
-# リージョン指定
 regions:
   - ap-northeast-1
 
-# インスタンスの状態フィルター（実行中のみ）
 filters:
   instance-state-name: running
   "tag:Name": "wordpress"
 
-# グループ設定
 groups:
   wordpress: "'wordpress' in tags.Name"
 
-# ホスト変数の設定
 compose:
   ansible_host: instance_id
-  actual_ip: public_ip_address
   ansible_connection: "'amazon.aws.aws_ssm'"
   ansible_aws_ssm_region: "'ap-northeast-1'"
   ansible_python_interpreter: "'/usr/bin/python3'"
+  instance_public_ip: public_ip_address
