@@ -1,6 +1,5 @@
 ---
 - hosts: wordpress
-  become: yes
   vars_files:
     - vars/main.yml
 
@@ -8,6 +7,7 @@
     - name: Install required packages
       import_tasks: tasks/packages.yml
       tags: packages
+      become: yes
 
     - name: Configure DDNS
       import_tasks: tasks/ddns.yml
@@ -16,6 +16,7 @@
     - name: Install and configure Docker
       import_tasks: tasks/docker.yml
       tags: docker
+      become: yes
 
     - name: Prepare application files and directories
       import_tasks: tasks/prepare_app.yml
@@ -24,7 +25,9 @@
     - name: Configure SSL certificates
       import_tasks: tasks/ssl.yml
       tags: ssl
+      become: yes
 
     - name: Deploy application
       import_tasks: tasks/deploy.yml
       tags: deploy
+      become: yes
