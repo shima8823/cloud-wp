@@ -3,10 +3,6 @@ data "aws_caller_identity" "current" {}
 resource "aws_iam_role" "terraform_admin" {
   name = "TerraformAdminRole"
 
-  lifecycle {
-    prevent_destroy = true
-  }
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -20,10 +16,8 @@ resource "aws_iam_role" "terraform_admin" {
     ]
   })
 
-  tags = {
-    Project   = "CloudStudy"
-    ManagedBy = "Terraform"
-    Owner     = "shima"
+  lifecycle {
+    prevent_destroy = true
   }
 }
 
@@ -41,8 +35,8 @@ resource "aws_iam_user_policy" "allow_assume_terraform_admin_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
         Action   = "sts:AssumeRole"
+        Effect   = "Allow"
         Resource = aws_iam_role.terraform_admin.arn
       }
     ]

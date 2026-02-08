@@ -1,6 +1,3 @@
-# ------------------------------------------------------------------------------
-# 1. ゲスト用ロール (制限付き管理者)
-# ------------------------------------------------------------------------------
 resource "aws_iam_role" "terraform_dev" {
   name = "TerraformDevRole"
 
@@ -16,7 +13,6 @@ resource "aws_iam_role" "terraform_dev" {
   })
 }
 
-# 基本権限: AdministratorAccessを与える
 resource "aws_iam_role_policy_attachment" "dev_admin_access" {
   role       = aws_iam_role.terraform_dev.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
@@ -63,8 +59,7 @@ resource "aws_iam_policy" "dev_guardrail" {
         ]
         Resource = "*"
       },
-      # 3. ガードレール外し(脱獄)の禁止
-      # このRoleとAdminRoleに対してポリシーを外したり、信頼関係を変えたりすることを禁止
+      # 3. RoleとAdminRoleに対してポリシーを外したり、信頼関係を変えたりすることを禁止
       {
         Sid    = "PreventRoleModification"
         Effect = "Deny"
@@ -97,7 +92,6 @@ resource "aws_iam_policy" "dev_guardrail" {
   })
 }
 
-# ガードレールポリシーをDevロールにアタッチ
 resource "aws_iam_role_policy_attachment" "dev_guardrail" {
   role       = aws_iam_role.terraform_dev.name
   policy_arn = aws_iam_policy.dev_guardrail.arn
