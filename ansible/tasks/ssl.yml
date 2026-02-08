@@ -1,30 +1,24 @@
 ---
 # Let's Encrypt SSL証明書の取得と更新設定
-- name: Check if certificate already exists
-  stat:
-    path: "/etc/letsencrypt/live/{{ dynu_hostname }}/fullchain.pem"
-  register: cert_exists
+- name: Configure Let's Encrypt
   when: dynu_hostname != '' and letsencrypt_email != ''
+  block:
+    - name: Obtain Let's Encrypt certificate
+      command: >
+        certbot certonly
+        --standalone
+        --preferred-challenges http
+        -d {{ dynu_hostname }}
+        --email {{ letsencrypt_email }}
+        --agree-tos
+        --non-interactive
+      args:
+        creates: "/etc/letsencrypt/live/{{ dynu_hostname }}/fullchain.pem"
 
-- name: Obtain Let's Encrypt certificate (before starting containers)
-  command: >
-    certbot certonly
-    --standalone
-    --preferred-challenges http
-    -d {{ dynu_hostname }}
-    --email {{ letsencrypt_email }}
-    --agree-tos
-    --non-interactive
-  when:
-    - dynu_hostname != ''
-    - letsencrypt_email != ''
-    - not cert_exists.stat.exists | default(false)
-
-- name: Setup certbot renewal cron job
-  cron:
-    name: "Renew Let's Encrypt certificates"
-    minute: "0"
-    hour: "3"
-    day: "1,15"
-    job: 'docker compose -f {{ srcs_dir }}/docker-compose.yml down && certbot renew --standalone && docker compose -f {{ srcs_dir }}/docker-compose.yml up -d >> /var/log/certbot-renewal.log 2>&1'
-  when: dynu_hostname != '' and letsencrypt_email != ''
+    - name: Setup certbot renewal cron job
+      cron:
+        name: "Renew Let's Encrypt certificates"
+        minute: "0"
+        hour: "3"
+        day: "1,15"
+        job: 'docker compose -f {{ srcs_dir }}/docker-compose.yml down && certbot renew --standalone && docker compose -f {{ srcs_dir }}/docker-compose.yml up -d >> /var/log/certbot-renewal.log 2>&1'
