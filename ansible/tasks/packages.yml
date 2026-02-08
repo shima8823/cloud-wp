@@ -2,6 +2,9 @@
 # 必要なパッケージのインストール
 - name: Update apt cache and install necessary packages
   apt:
-    name: "{{ required_packages }}"
+    name:
+      - ca-certificates
+      - curl
+      - certbot
     update_cache: yes
     state: present
