@@ -6,7 +6,6 @@
     - name: Update Dynu IP address
       uri:
         url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ instance_public_ip }}"
-      delegate_to: localhost
       no_log: true
 
     - name: Create DDNS script directory
