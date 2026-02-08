@@ -1,4 +1,7 @@
 resource "aws_s3_bucket" "ssm_artifacts" {
+  # Ansibleの実行が失敗するとバケットにファイルが残ってしまうので削除可能にする
+  force_destroy = true
+
   tags = {
     Name = "ansible-ssm-bucket"
   }
