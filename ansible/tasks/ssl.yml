@@ -3,6 +3,7 @@
 - name: Configure Let's Encrypt
   when: dynu_hostname != '' and letsencrypt_email != ''
   block:
+    # TODO: 更新時にWebサーバーを停止したくない場合はwebrootに設定する
     - name: Obtain Let's Encrypt certificate
       command: >
         certbot certonly
