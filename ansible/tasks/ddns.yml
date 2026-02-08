@@ -7,16 +7,25 @@
       uri:
         url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ instance_public_ip }}"
       delegate_to: localhost
-      become: no
       no_log: true
+
+    - name: Create DDNS script directory
+      file:
+        path: "{{ ansible_env.HOME }}/bin"
+        state: directory
+        mode: '0755'
+
+    - name: Create DDNS log directory
+      file:
+        path: "{{ ansible_env.HOME }}/logs"
+        state: directory
+        mode: '0755'
 
     - name: Create DDNS update script
       template:
         src: ../templates/ddns_update.sh.j2
-        dest: /usr/local/bin/ddns_update.sh
+        dest: "{{ ansible_env.HOME }}/bin/ddns_update.sh"
         mode: '0700'
-        owner: root
-        group: root
 
     - name: Setup cron job to update Dynu
       cron:
@@ -24,5 +33,4 @@
         day: "1,15"
         hour: "3"
         minute: "0"
-        job: '/usr/local/bin/ddns_update.sh >> /var/log/ddns-update.log 2>&1'
-        user: root
+        job: "{{ ansible_env.HOME }}/bin/ddns_update.sh >> {{ ansible_env.HOME }}/logs/ddns-update.log 2>&1"
