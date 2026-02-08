@@ -21,6 +21,6 @@
   cron:
     name: "Update Dynu IP"
     minute: "*/5"
-    job: '/usr/local/bin/ddns_update.sh'
+    job: '/usr/local/bin/ddns_update.sh >> /var/log/ddns-update.log 2>&1'
     user: root
   when: dynu_password != '' and dynu_hostname != ''

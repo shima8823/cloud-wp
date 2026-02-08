@@ -5,13 +5,13 @@
     - vars/main.yml
 
   tasks:
-    - name: Configure DDNS
-      import_tasks: tasks/ddns.yml
-      tags: ddns
-
     - name: Install required packages
       import_tasks: tasks/packages.yml
       tags: packages
+
+    - name: Configure DDNS
+      import_tasks: tasks/ddns.yml
+      tags: ddns
 
     - name: Install and configure Docker
       import_tasks: tasks/docker.yml
