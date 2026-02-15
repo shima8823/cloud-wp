@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -eu
 
+DYNU_HOSTNAME="{{ dynu_hostname }}"
+DYNU_PASSWORD="{{ dynu_password }}"
+
 response="$(
-  curl -fsS "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}"
+  curl -fsS "https://api.dynu.com/nic/update?hostname=${DYNU_HOSTNAME}&password=${DYNU_PASSWORD}"
 )"
 
 if [[ "$response" == good* || "$response" == nochg* ]]; then
