@@ -1,6 +1,14 @@
-.PHONY: deploy
+.PHONY: install lint deploy
 
 TERRAFORM_APP_DIR ?= ../infra/app
+
+install:
+	pip install -r requirements-dev.txt
+	ansible-galaxy collection install -r requirements.yml
+
+lint:
+	ansible-playbook --syntax-check main.yml -i wordpress,
+	ansible-lint main.yml
 
 deploy:
 	@BUCKET=$$(terraform -chdir=$(TERRAFORM_APP_DIR) output -raw ansible_ssm_bucket_name); \
