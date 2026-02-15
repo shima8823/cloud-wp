@@ -28,6 +28,7 @@
     path: "{{ item }}"
     state: directory
     mode: "0755"
+  become: true
   loop:
     - "{{ data_dir }}/nginx/logs"
     - "{{ data_dir }}/wordpress/data"
