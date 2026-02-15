@@ -12,6 +12,8 @@
     dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
 
+# Docker リポジトリは Ubuntu 20.04 (focal) / amd64 固定。
+# Terraform (infra/app/compute.tf) の AMI 選択と一致させる必要がある。
 - name: Add Docker's official repository
   ansible.builtin.apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu focal stable"
