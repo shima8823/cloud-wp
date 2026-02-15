@@ -4,7 +4,7 @@
   ansible.builtin.copy:
     src: "{{ local_srcs_dir }}/"
     dest: "{{ srcs_dir }}/"
-    mode: "u=rwX,g=rX,o=rX"
+    mode: "u=rwX,g=,o="
 
 # ドメイン名が設定されていない場合は、EC2のパブリックIPを設定する
 - name: Set DOMAIN_NAME in .env
