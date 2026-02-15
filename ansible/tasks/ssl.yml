@@ -3,8 +3,9 @@
 - name: Configure Let's Encrypt
   when: dynu_hostname != '' and letsencrypt_email != ''
   block:
-    # standalone 方式のため更新時に compose down が必要。
-    # TODO: 更新時にWebサーバーを停止したくない場合はwebrootに設定する
+    # standalone 方式のため更新時にポート80を空ける必要がある。
+    # --pre-hook / --post-hook により実際に更新が行われるときだけ停止・再起動する。
+    # TODO: webroot方式に変更する
     - name: Obtain Let's Encrypt certificate
       ansible.builtin.command: >
         certbot certonly
@@ -24,7 +25,7 @@
         hour: "3"
         day: "1,15"
         job: >-
-          docker compose -f {{ srcs_dir }}/docker-compose.yml down
-          && certbot renew --standalone
-          && docker compose -f {{ srcs_dir }}/docker-compose.yml up -d
+          certbot renew --standalone
+          --pre-hook "docker compose -f {{ srcs_dir }}/docker-compose.yml down"
+          --post-hook "docker compose -f {{ srcs_dir }}/docker-compose.yml up -d"
           >> /var/log/certbot-renewal.log 2>&1
