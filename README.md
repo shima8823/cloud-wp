@@ -70,7 +70,9 @@ make apply-app
 
 ```bash
 cd ../ansible
-ansible-playbook -i inventory/aws_ec2.yml main.yml
+pip install -r requirements-dev.txt
+ansible-galaxy collection install -r requirements.yml
+make deploy
 ```
 
 ### 5. アクセス確認
