@@ -3,6 +3,7 @@
 - name: Configure Let's Encrypt
   when: dynu_hostname != '' and letsencrypt_email != ''
   block:
+    # standalone 方式のため更新時に compose down が必要。
     # TODO: 更新時にWebサーバーを停止したくない場合はwebrootに設定する
     - name: Obtain Let's Encrypt certificate
       ansible.builtin.command: >
