@@ -10,9 +10,6 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: '0755'
   loop:
     - "{{ data_dir }}/nginx/logs"
     - "{{ data_dir }}/wordpress/data"
