@@ -1,6 +1,6 @@
 ---
 # ディレクトリ設定
-local_srcs_dir: "{{ lookup('env', 'LOCAL_SRCS_DIR') | default('../app/srcs/', true) }}"
+local_srcs_dir: "{{ lookup('env', 'LOCAL_SRCS_DIR') | default('../app/srcs', true) }}"
 srcs_dir: "{{ ansible_env.HOME }}/srcs"
 data_dir: "{{ ansible_env.HOME }}/data"
 

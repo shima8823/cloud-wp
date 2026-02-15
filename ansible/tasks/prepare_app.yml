@@ -2,7 +2,7 @@
 # アプリケーションファイルとディレクトリの準備
 - name: Copy srcs to server
   ansible.builtin.copy:
-    src: "{{ local_srcs_dir }}"
+    src: "{{ local_srcs_dir }}/"
     dest: "{{ srcs_dir }}/"
     mode: "u=rwX,g=rX,o=rX"
 
