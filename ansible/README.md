@@ -25,7 +25,7 @@ eval "$(make -C ../infra get-auth-dev)"
 cd ansible
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 ansible-galaxy collection install -r requirements.yml
 ```
 

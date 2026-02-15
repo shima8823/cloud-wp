@@ -70,7 +70,7 @@ make apply-app
 
 ```bash
 cd ../ansible
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 ansible-galaxy collection install -r requirements.yml
 make deploy
 ```
