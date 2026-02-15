@@ -8,7 +8,8 @@
         url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ instance_public_ip }}"
         return_content: true
       register: dynu_result
-      changed_when: dynu_result.content is search('good')
+      changed_when: dynu_result.content is match('^good')
+      failed_when: dynu_result.status != 200 or (dynu_result.content is not match('^(good|nochg)'))
       no_log: true
 
     - name: Create DDNS script directory
