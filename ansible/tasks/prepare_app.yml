@@ -12,17 +12,22 @@
     path: "{{ srcs_dir }}/.env"
     regexp: '^DOMAIN_NAME='
     line: "DOMAIN_NAME={{ dynu_hostname if dynu_hostname else instance_public_ip }}"
+    create: true
+    mode: "0600"
 
 - name: Set WP_URL in .env
   ansible.builtin.lineinfile:
     path: "{{ srcs_dir }}/.env"
     regexp: '^WP_URL='
     line: "WP_URL=https://{{ dynu_hostname if dynu_hostname else instance_public_ip }}"
+    create: true
+    mode: "0600"
 
 - name: Create volume directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    mode: "0755"
   loop:
     - "{{ data_dir }}/nginx/logs"
     - "{{ data_dir }}/wordpress/data"
