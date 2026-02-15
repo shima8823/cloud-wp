@@ -209,10 +209,12 @@ cloud-1/
 │   └── app/                    # アプリケーションリソース（EC2, VPC など）
 ├── ansible/                     # Ansible (構成管理)
 │   ├── inventory/              # インベントリ（AWS 動的インベントリ）
-│   ├── roles/                  # ロール（WordPress, Docker など）
+│   ├── tasks/                  # タスクファイル（Docker, SSL, デプロイなど）
+│   ├── templates/              # Jinja2 テンプレート
+│   ├── vars/                   # 変数定義
 │   └── main.yml                # メインプレイブック
 └── app/                         # WordPress アプリケーション
-    └── docker-compose.yml      # Docker Compose 設定
+    └── srcs/                   # Docker Compose 設定とサービス定義
 ```
 
 ---
