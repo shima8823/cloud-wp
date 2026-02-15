@@ -6,6 +6,14 @@
     # standalone 方式のため更新時にポート80を空ける必要がある。
     # --pre-hook / --post-hook により実際に更新が行われるときだけ停止・再起動する。
     # TODO: webroot方式に変更する
+    - name: Wait for DNS propagation
+      ansible.builtin.command: "dig +short {{ dynu_hostname }}"
+      register: dns_check
+      until: dns_check.stdout | trim == instance_public_ip
+      retries: 10
+      delay: 30
+      changed_when: false
+
     - name: Obtain Let's Encrypt certificate
       ansible.builtin.command: >
         certbot certonly
