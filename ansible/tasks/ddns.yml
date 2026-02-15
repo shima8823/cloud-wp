@@ -29,6 +29,7 @@
         src: templates/ddns_update.sh.j2
         dest: "{{ ansible_env.HOME }}/bin/ddns_update.sh"
         mode: '0700'
+      no_log: true
 
     - name: Setup cron job to update Dynu
       ansible.builtin.cron:
