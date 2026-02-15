@@ -6,6 +6,9 @@
     - name: Update Dynu IP address
       ansible.builtin.uri:
         url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ instance_public_ip }}"
+        return_content: true
+      register: dynu_result
+      changed_when: dynu_result.content is search('good')
       no_log: true
 
     - name: Create DDNS script directory
