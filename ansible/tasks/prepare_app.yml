@@ -6,6 +6,19 @@
     dest: "{{ srcs_dir }}/"
     mode: "u=rwX,g=rX,o=rX"
 
+# ドメイン名が設定されていない場合は、EC2のパブリックIPを設定する
+- name: Set DOMAIN_NAME in .env
+  ansible.builtin.lineinfile:
+    path: "{{ srcs_dir }}/.env"
+    regexp: '^DOMAIN_NAME='
+    line: "DOMAIN_NAME={{ dynu_hostname if dynu_hostname else instance_public_ip }}"
+
+- name: Set WP_URL in .env
+  ansible.builtin.lineinfile:
+    path: "{{ srcs_dir }}/.env"
+    regexp: '^WP_URL='
+    line: "WP_URL=https://{{ dynu_hostname if dynu_hostname else instance_public_ip }}"
+
 - name: Create volume directories
   ansible.builtin.file:
     path: "{{ item }}"
