@@ -1,32 +1,32 @@
 ---
 # Docker のインストールと設定
 - name: Create keyrings directory
-  file:
+  ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
 
 - name: Download Docker's official GPG key
-  get_url:
+  ansible.builtin.get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
     dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
 
 - name: Add Docker's official repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu focal stable"
     state: present
 
 - name: Install docker engine
-  apt:
+  ansible.builtin.apt:
     name:
       - docker-ce
       - docker-compose-plugin
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Enable and start Docker service
-  systemd:
+  ansible.builtin.systemd:
     name: docker
     state: started
-    enabled: yes
+    enabled: true

@@ -1,13 +1,13 @@
 ---
 # アプリケーションファイルとディレクトリの準備
 - name: Copy srcs to server
-  copy:
+  ansible.builtin.copy:
     src: "{{ local_srcs_dir }}"
     dest: "{{ srcs_dir }}/"
     mode: "u=rwX,g=rX,o=rX"
 
 - name: Create volume directories
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ ansible_user_id }}"

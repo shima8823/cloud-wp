@@ -1,6 +1,7 @@
 ---
 # Docker Composeでアプリケーションを起動
 - name: Start application containers
-  shell: docker compose -f {{ srcs_dir }}/docker-compose.yml up -d
+  ansible.builtin.command: docker compose -f {{ srcs_dir }}/docker-compose.yml up -d
   args:
     chdir: "{{ srcs_dir }}"
+  changed_when: true

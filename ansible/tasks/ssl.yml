@@ -5,7 +5,7 @@
   block:
     # TODO: 更新時にWebサーバーを停止したくない場合はwebrootに設定する
     - name: Obtain Let's Encrypt certificate
-      command: >
+      ansible.builtin.command: >
         certbot certonly
         --standalone
         --preferred-challenges http
@@ -17,9 +17,13 @@
         creates: "/etc/letsencrypt/live/{{ dynu_hostname }}/fullchain.pem"
 
     - name: Setup certbot renewal cron job
-      cron:
+      ansible.builtin.cron:
         name: "Renew Let's Encrypt certificates"
         minute: "0"
         hour: "3"
         day: "1,15"
-        job: 'docker compose -f {{ srcs_dir }}/docker-compose.yml down && certbot renew --standalone && docker compose -f {{ srcs_dir }}/docker-compose.yml up -d >> /var/log/certbot-renewal.log 2>&1'
+        job: >-
+          docker compose -f {{ srcs_dir }}/docker-compose.yml down
+          && certbot renew --standalone
+          && docker compose -f {{ srcs_dir }}/docker-compose.yml up -d
+          >> /var/log/certbot-renewal.log 2>&1

@@ -4,30 +4,30 @@
   when: dynu_password != '' and dynu_hostname != ''
   block:
     - name: Update Dynu IP address
-      uri:
+      ansible.builtin.uri:
         url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ instance_public_ip }}"
       no_log: true
 
     - name: Create DDNS script directory
-      file:
+      ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/bin"
         state: directory
         mode: '0700'
 
     - name: Create DDNS log directory
-      file:
+      ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/logs"
         state: directory
         mode: '0700'
 
     - name: Create DDNS update script
-      template:
-        src: ../templates/ddns_update.sh.j2
+      ansible.builtin.template:
+        src: templates/ddns_update.sh.j2
         dest: "{{ ansible_env.HOME }}/bin/ddns_update.sh"
         mode: '0700'
 
     - name: Setup cron job to update Dynu
-      cron:
+      ansible.builtin.cron:
         name: "Update Dynu IP"
         day: "1,15"
         hour: "3"

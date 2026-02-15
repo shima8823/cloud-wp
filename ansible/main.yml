@@ -1,33 +1,34 @@
 ---
-- hosts: wordpress
+- name: Deploy WordPress
+  hosts: wordpress
   vars_files:
     - vars/main.yml
 
   tasks:
     - name: Install required packages
-      import_tasks: tasks/packages.yml
+      ansible.builtin.import_tasks: tasks/packages.yml
       tags: packages
-      become: yes
+      become: true
 
     - name: Configure DDNS
-      import_tasks: tasks/ddns.yml
+      ansible.builtin.import_tasks: tasks/ddns.yml
       tags: ddns
 
     - name: Install and configure Docker
-      import_tasks: tasks/docker.yml
+      ansible.builtin.import_tasks: tasks/docker.yml
       tags: docker
-      become: yes
+      become: true
 
     - name: Prepare application files and directories
-      import_tasks: tasks/prepare_app.yml
+      ansible.builtin.import_tasks: tasks/prepare_app.yml
       tags: prepare
 
     - name: Configure SSL certificates
-      import_tasks: tasks/ssl.yml
+      ansible.builtin.import_tasks: tasks/ssl.yml
       tags: ssl
-      become: yes
+      become: true
 
     - name: Deploy application
-      import_tasks: tasks/deploy.yml
+      ansible.builtin.import_tasks: tasks/deploy.yml
       tags: deploy
-      become: yes
+      become: true
