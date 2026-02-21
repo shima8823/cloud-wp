@@ -16,7 +16,8 @@
     mode: "0600"
   when: dynu_hostname == ''
 
-- name: Create volume directories
+# コンテナが起動時にパーミッションを変更するため、mode指定しない
+- name: Create volume directories # noqa: risky-file-permissions
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory

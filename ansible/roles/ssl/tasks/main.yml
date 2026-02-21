@@ -6,6 +6,11 @@
     # standalone 方式のため更新時にポート80を空ける必要がある。
     # --pre-hook / --post-hook により実際に更新が行われるときだけ停止・再起動する。
     # TODO: webroot方式に変更する
+    - name: Check if certificate already exists
+      ansible.builtin.stat:
+        path: "/etc/letsencrypt/live/{{ dynu_hostname }}/fullchain.pem"
+      register: cert_file
+
     - name: Wait for DNS propagation
       ansible.builtin.command: "dig +short {{ dynu_hostname }}"
       register: dns_check
@@ -13,6 +18,15 @@
       retries: 10
       delay: 30
       changed_when: false
+      when: not cert_file.stat.exists
+
+    # ローカルDNSリゾルバが更新を反映してもLet's Encryptの
+    # secondary validationサーバー（世界各地）には未伝播の場合がある。
+    # グローバル伝播を待つために追加で待機する。
+    - name: Wait for global DNS propagation
+      ansible.builtin.pause:
+        seconds: 60
+      when: not cert_file.stat.exists
 
     - name: Obtain Let's Encrypt certificate
       ansible.builtin.command: >
