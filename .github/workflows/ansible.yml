@@ -15,8 +15,6 @@ jobs:
   ansible-lint:
     name: Ansible Lint
     runs-on: ubuntu-latest
-    env:
-      UV_SYSTEM_PYTHON: 1
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v7
@@ -26,8 +24,11 @@ jobs:
           cache-dependency-glob: "ansible/requirements.txt"
       - name: Install dependencies
         run: |
+          uv venv
+          source .venv/bin/activate
           uv pip install -r ansible/requirements.txt
           ansible-galaxy collection install -r ansible/requirements.yml
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
       - name: Syntax check
         run: ansible-playbook --syntax-check ansible/main.yml -i wordpress,
       - name: Lint
