@@ -8,3 +8,6 @@ pre-commit:
       glob: "*.{tf,tfvars}"
       run: terraform fmt -recursive
       stage_fixed: true
+    ansible-lint:
+      glob: "ansible/**/*.{yml,yaml}"
+      run: make -C ansible lint
