@@ -10,7 +10,7 @@
 
 - name: Create DDNS update script
   template:
-    src: ../templates/ddns_update.sh.j2
+    src: ddns_update.sh.j2
     dest: /usr/local/bin/ddns_update.sh
     mode: '0700'
     owner: root

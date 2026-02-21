@@ -1,0 +1,9 @@
+---
+# Let's Encrypt設定（環境変数から取得）
+letsencrypt_email: "{{ lookup('env', 'LETSENCRYPT_EMAIL') }}"
+cert_path: "/etc/letsencrypt/live/{{ dynu_hostname }}/fullchain.pem"
+
+# Cron設定
+cert_renewal_day: "1,15"
+cert_renewal_hour: "3"
+cert_renewal_minute: "0"

@@ -1,0 +1,7 @@
+---
+# DDNS設定（環境変数から取得）
+dynu_hostname: "{{ lookup('env', 'DYNU_HOSTNAME') }}"
+dynu_password: "{{ lookup('env', 'DYNU_PASSWORD') }}"
+
+# Cron設定
+ddns_update_interval: "*/5"

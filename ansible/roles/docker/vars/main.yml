@@ -1,0 +1,5 @@
+---
+# Docker設定
+docker_keyrings_dir: /etc/apt/keyrings
+docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
+docker_gpg_key_path: "{{ docker_keyrings_dir }}/docker.asc"
