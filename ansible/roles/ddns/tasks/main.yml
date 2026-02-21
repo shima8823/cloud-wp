@@ -1,0 +1,40 @@
+---
+# DDNS (Dynamic DNS) の設定と更新
+- name: Configure Dynu updates
+  when: dynu_password != '' and dynu_hostname != ''
+  block:
+    - name: Update Dynu IP address
+      ansible.builtin.uri:
+        url: "https://api.dynu.com/nic/update?hostname={{ dynu_hostname }}&password={{ dynu_password }}&myip={{ instance_public_ip }}"
+        return_content: true
+      register: dynu_result
+      changed_when: dynu_result.content is match('^good')
+      failed_when: dynu_result.status != 200 or (dynu_result.content is not match('^(good|nochg)'))
+      no_log: true
+
+    - name: Create DDNS script directory
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/bin"
+        state: directory
+        mode: '0700'
+
+    - name: Create DDNS log directory
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/logs"
+        state: directory
+        mode: '0700'
+
+    - name: Create DDNS update script
+      ansible.builtin.template:
+        src: ddns_update.sh.j2
+        dest: "{{ ansible_env.HOME }}/bin/ddns_update.sh"
+        mode: '0700'
+      no_log: true
+
+    - name: Setup cron job to update Dynu
+      ansible.builtin.cron:
+        name: "Update Dynu IP"
+        day: "1,15"
+        hour: "3"
+        minute: "0"
+        job: "{{ ansible_env.HOME }}/bin/ddns_update.sh >> {{ ansible_env.HOME }}/logs/ddns-update.log 2>&1"

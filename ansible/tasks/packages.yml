@@ -1,7 +1,10 @@
 ---
 # 必要なパッケージのインストール
 - name: Update apt cache and install necessary packages
-  apt:
-    name: "{{ required_packages }}"
-    update_cache: yes
-    state: present
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - certbot
+      - dnsutils
+    update_cache: true

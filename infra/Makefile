@@ -33,10 +33,19 @@ re-app:
 	@terraform -chdir=app destroy -auto-approve
 	@terraform -chdir=app apply -auto-approve
 
+ssh:
+	@ID=$$(terraform -chdir=app output -raw instance_id); \
+	if [ -z "$$ID" ]; then \
+		echo "Error: Could not get instance_id from Terraform output."; \
+		exit 1; \
+	fi; \
+	aws ssm start-session --target $$ID
+
 # terraform開発者の一時的なaccess key, secret key, session tokenを取得
 # --duration-seconds min 15m, max 1h
 get-auth-dev:
-	@ROLE_ARN=$$(terraform -chdir=bootstrap output -raw terraform_dev_role_arn); \
+	@unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN; \
+	ROLE_ARN=$$(terraform -chdir=bootstrap output -raw terraform_dev_role_arn); \
 	creds=$$(aws sts assume-role \
 		--role-arn $$ROLE_ARN \
 		--role-session-name dev-session \

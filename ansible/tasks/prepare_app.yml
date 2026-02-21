@@ -1,18 +1,27 @@
 ---
 # アプリケーションファイルとディレクトリの準備
 - name: Copy srcs to server
-  copy:
-    src: "{{ local_srcs_dir }}"
+  ansible.builtin.copy:
+    src: "{{ local_srcs_dir }}/"
     dest: "{{ srcs_dir }}/"
-    mode: '0755'
+    mode: "u=rwX,g=,o="
 
-- name: Create volume directories
-  file:
+# DDNS未使用時はEC2パブリックIPをドメイン名として設定する
+# WP_URLは.env内で${DOMAIN_NAME}を参照しているためDocker Composeが展開する
+- name: Set DOMAIN_NAME in .env
+  ansible.builtin.lineinfile:
+    path: "{{ srcs_dir }}/.env"
+    regexp: '^DOMAIN_NAME='
+    line: "DOMAIN_NAME={{ instance_public_ip }}"
+    mode: "0600"
+  when: dynu_hostname == ''
+
+# コンテナが起動時にパーミッションを変更するため、mode指定しない
+- name: Create volume directories # noqa: risky-file-permissions
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: '0755'
+  become: true
   loop:
     - "{{ data_dir }}/nginx/logs"
     - "{{ data_dir }}/wordpress/data"
