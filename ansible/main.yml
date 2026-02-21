@@ -4,29 +4,28 @@
   vars_files:
     - vars/main.yml
 
-  tasks:
+  pre_tasks:
     - name: Install required packages
       ansible.builtin.import_tasks: tasks/packages.yml
       tags: packages
       become: true
 
-    - name: Configure DDNS
-      ansible.builtin.import_tasks: tasks/ddns.yml
+  roles:
+    - role: ddns
       tags: ddns
 
-    - name: Install and configure Docker
-      ansible.builtin.import_tasks: tasks/docker.yml
+    - role: docker
       tags: docker
       become: true
 
+    - role: ssl
+      tags: ssl
+      become: true
+
+  tasks:
     - name: Prepare application files and directories
       ansible.builtin.import_tasks: tasks/prepare_app.yml
       tags: prepare
-
-    - name: Configure SSL certificates
-      ansible.builtin.import_tasks: tasks/ssl.yml
-      tags: ssl
-      become: true
 
     - name: Deploy application
       ansible.builtin.import_tasks: tasks/deploy.yml
