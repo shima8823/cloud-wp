@@ -62,5 +62,5 @@ ansible-lint main.yml
 
 ## Notes
 
-- SSL は現在 `standalone` 方式です（`tasks/ssl.yml` 参照）。
+- SSL は現在 `standalone` 方式です（`roles/ssl/tasks/main.yml` 参照）。
 - 更新時の停止を避ける `webroot` 化は TODO として管理しています。
