@@ -11,7 +11,7 @@
 ### Supported Environment
 
 - **OS**: Ubuntu 20.04 (focal) — 課題要件により固定
-- **Arch**: amd64 — `tasks/docker.yml` の Docker リポジトリと `infra/app/compute.tf` の AMI が一致する前提
+- **Arch**: amd64 — `roles/docker` の Docker リポジトリと `infra/app/compute.tf` の AMI が一致する前提
 
 推奨: ルートの `infra` で認証情報を取得
 
