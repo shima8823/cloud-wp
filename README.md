@@ -17,7 +17,7 @@ Terraform による IaC（Infrastructure as Code）と Ansible による構成�
 - [Terraform](https://www.terraform.io/) `~> 1.14.0`
 - [Ansible](https://www.ansible.com/) `>= 2.17, < 2.18`
 - [AWS CLI](https://aws.amazon.com/cli/)
-- Python 3.x、pip
+- Python 3.x、[uv](https://docs.astral.sh/uv/)
 
 ### AWS アカウント
 - 初回セットアップについては [`docs/AWS_SETUP.md`](./docs/AWS_SETUP.md) を参照してください
@@ -70,8 +70,8 @@ make apply-app
 
 ```bash
 cd ../ansible
-pip install -r requirements.txt
-ansible-galaxy collection install -r requirements.yml
+uv venv && source .venv/bin/activate
+make install
 make deploy
 ```
 

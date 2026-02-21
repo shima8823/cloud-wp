@@ -7,6 +7,7 @@
 - `infra/app` が `terraform apply` 済みであること
 - AWS 認証情報が有効であること
 - Python 3.10+ が使えること
+- [uv](https://docs.astral.sh/uv/) がインストール済みであること
 
 ### Supported Environment
 
@@ -23,9 +24,9 @@ eval "$(make -C ../infra get-auth-dev)"
 
 ```bash
 cd ansible
-python3 -m venv .venv
+uv venv
 source .venv/bin/activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ansible-galaxy collection install -r requirements.yml
 ```
 

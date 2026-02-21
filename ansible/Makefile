@@ -3,7 +3,7 @@
 TERRAFORM_APP_DIR ?= ../infra/app
 
 install:
-	pip install -r requirements.txt
+	uv pip install -r requirements.txt
 	ansible-galaxy collection install -r requirements.yml
 
 lint:
