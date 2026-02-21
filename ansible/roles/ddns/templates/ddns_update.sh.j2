@@ -5,7 +5,9 @@ DYNU_HOSTNAME="{{ dynu_hostname }}"
 DYNU_PASSWORD="{{ dynu_password }}"
 
 response="$(
-  curl -fsS "https://api.dynu.com/nic/update?hostname=${DYNU_HOSTNAME}&password=${DYNU_PASSWORD}"
+  curl -fsS --config - <<CURLCONF
+url = "https://api.dynu.com/nic/update?hostname=${DYNU_HOSTNAME}&password=${DYNU_PASSWORD}"
+CURLCONF
 )"
 
 if [[ "$response" == good* || "$response" == nochg* ]]; then
